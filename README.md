@@ -11,6 +11,7 @@ A Go-based ledger application for tracking user balances and transactions.
 ## Environment Setup
 
 1. Copy the `.env.example` to `.env` and update the values:
+
 ```
 DB_HOST=localhost
 DB_PORT=5432
@@ -23,11 +24,13 @@ SERVER_PORT=8080
 ## Running the Application
 
 1. Install dependencies:
+
 ```bash
 go mod download
 ```
 
 2. Run the application:
+
 ```bash
 go run main.go
 ```
@@ -35,10 +38,12 @@ go run main.go
 ## API Endpoints
 
 ### Create User
+
 - **POST** `/api/users`
+
 ```json
 {
-    "name": "John Doe"
+  "name": "John Doe"
 }
 ```
 
