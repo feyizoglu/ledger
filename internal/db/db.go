@@ -26,7 +26,7 @@ func InitDB() (*sql.DB, error) {
 		return nil, fmt.Errorf("error connecting to the database: %v", err)
 	}
 
-	// Create users table if it doesn't exist
+	// Create tables if they don't exist
 	if err = createTables(db); err != nil {
 		return nil, fmt.Errorf("error creating tables: %v", err)
 	}
@@ -39,16 +39,26 @@ func createTables(db *sql.DB) error {
 		CREATE TABLE IF NOT EXISTS users (
 			id SERIAL PRIMARY KEY,
 			name VARCHAR(255) NOT NULL,
-			created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+			balance DECIMAL(10,2) DEFAULT 0.00
 		);
 		
 		CREATE TABLE IF NOT EXISTS transactions (
 			id SERIAL PRIMARY KEY,
-			user_id INTEGER REFERENCES users(id),
-			amount DECIMAL(15,2) NOT NULL,
-			description TEXT,
-			created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+			from_user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+			to_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+			amount DECIMAL(10,2) NOT NULL,
+			type VARCHAR(20) NOT NULL,
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			CONSTRAINT valid_transaction_type CHECK (type IN ('credit', 'transfer', 'withdrawal')),
+			CONSTRAINT valid_transaction CHECK (
+				(type = 'credit' AND from_user_id IS NULL) OR
+				(type = 'transfer' AND from_user_id IS NOT NULL) OR
+				(type = 'withdrawal' AND from_user_id IS NULL)
+			)
 		);
+
+		CREATE INDEX IF NOT EXISTS idx_transactions_users ON transactions(from_user_id, to_user_id);
+		CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON transactions(created_at);
 	`
 
 	_, err := db.Exec(query)

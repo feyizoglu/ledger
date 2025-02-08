@@ -19,3 +19,13 @@ type UserBalance struct {
 type AddCreditRequest struct {
 	Amount float64 `json:"amount"`
 }
+
+type TransferRequest struct {
+	FromUserID int64   `json:"from_user_id"`
+	ToUserID   int64   `json:"to_user_id"`
+	Amount     float64 `json:"amount"`
+}
+
+type WithdrawRequest struct {
+	Amount float64 `json:"amount"`
+}

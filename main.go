@@ -4,9 +4,10 @@ import (
 	"log"
 	"os"
 
-	"github.com/joho/godotenv"
 	"ledger/internal/api"
 	"ledger/internal/db"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
