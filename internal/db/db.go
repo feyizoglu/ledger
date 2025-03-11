@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 
 	_ "github.com/lib/pq"
@@ -17,6 +18,8 @@ func InitDB() (*sql.DB, error) {
 		os.Getenv("DB_NAME"),
 	)
 
+	log.Printf("Connecting to database with connection string: %s", connStr)
+
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return nil, fmt.Errorf("error opening database: %v", err)
@@ -26,20 +29,30 @@ func InitDB() (*sql.DB, error) {
 		return nil, fmt.Errorf("error connecting to the database: %v", err)
 	}
 
+	log.Printf("Successfully connected to database")
+
 	// Create tables if they don't exist
 	if err = createTables(db); err != nil {
 		return nil, fmt.Errorf("error creating tables: %v", err)
 	}
 
+	log.Printf("Tables created successfully")
+
 	return db, nil
 }
 
 func createTables(db *sql.DB) error {
+	log.Printf("Starting to create tables...")
+
 	query := `
 		CREATE TABLE IF NOT EXISTS users (
 			id SERIAL PRIMARY KEY,
 			name VARCHAR(255) NOT NULL,
-			balance DECIMAL(10,2) DEFAULT 0.00
+			email VARCHAR(255) UNIQUE NOT NULL,
+			password_hash VARCHAR(255) NOT NULL,
+			role VARCHAR(20) NOT NULL CHECK (role IN ('user', 'admin')),
+			balance DECIMAL(10,2) DEFAULT 0.00,
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 		);
 		
 		CREATE TABLE IF NOT EXISTS transactions (
@@ -62,5 +75,11 @@ func createTables(db *sql.DB) error {
 	`
 
 	_, err := db.Exec(query)
-	return err
+	if err != nil {
+		log.Printf("Error creating tables: %v", err)
+		return err
+	}
+
+	log.Printf("Tables created successfully")
+	return nil
 }

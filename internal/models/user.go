@@ -3,11 +3,16 @@ package models
 type User struct {
 	ID      int64   `json:"id"`
 	Name    string  `json:"name"`
+	Email   string  `json:"email"`
+	Role    string  `json:"role"`
 	Balance float64 `json:"balance"`
 }
 
 type CreateUserRequest struct {
-	Name string `json:"name"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Role     string `json:"role"`
 }
 
 type UserBalance struct {

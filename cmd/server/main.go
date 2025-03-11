@@ -25,7 +25,7 @@ func main() {
 	}
 	defer db.Close()
 
-	server := api.NewServer(db)
+	server := api.NewServer(db, log.New(os.Stdout, "", log.LstdFlags))
 
 	log.Printf("Server starting on :%s", os.Getenv("SERVER_PORT"))
 	if err := server.Start(":" + os.Getenv("SERVER_PORT")); err != nil {
